@@ -1,0 +1,41 @@
+{
+    "name": "onaonbir/oo-settings",
+    "description": "Flexible and polymorphic model-based settings system for Laravel applications.",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "MIT",
+    "keywords": ["laravel", "settings", "model settings", "polymorphic", "package"],
+
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "^10.0|^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "OnaOnbir\\OOSettings\\": "src/"
+        },
+        "files": [
+            "helpers/oo_settings_helper.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "OnaOnbir\\OOSettings\\OOSettingsServiceProvider"
+            ]
+        }
+    },
+    "authors": [
+        {
+            "name": "Berkay Barışkan",
+            "email": "berkaybariskan0208@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/onaonbir/oo-settings/issues",
+        "source": "https://github.com/onaonbir/oo-settings"
+    },
+
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
