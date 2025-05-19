@@ -2,7 +2,7 @@
     "name": "onaonbir/oo-settings",
     "description": "Flexible and polymorphic model-based settings system for Laravel applications.",
     "type": "library",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": "MIT",
     "keywords": ["laravel", "settings", "model settings", "polymorphic", "package"],
 

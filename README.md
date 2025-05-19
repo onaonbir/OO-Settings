@@ -125,9 +125,7 @@ oo_setting_m($user, 'notifications.email', true);
 
 ---
 
-## 📄 License
+## 🛠️ License
 
 MIT © OnaOnbir
-Crafted for professional Laravel applications.
-If you find it helpful, consider leaving a ⭐ on GitHub!
-
+Made with ☕ and late nights.
