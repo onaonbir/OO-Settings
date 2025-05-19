@@ -31,7 +31,7 @@ class OOSettings
             : data_get($setting->value, $nestedKey, $default);
     }
 
-    public static function set(string $key, mixed $value,string $name = null,string $description = null): void
+    public static function set(string $key, mixed $value, ?string $name = null, ?string $description = null): void
     {
         [$mainKey, $nestedKey] = self::splitKey($key);
 
@@ -98,7 +98,7 @@ class OOSettings
             : data_get($setting->value, $nestedKey, $default);
     }
 
-    public static function setForModel(Model $model, string $key, mixed $value,string $name = null,string $description = null): void
+    public static function setForModel(Model $model, string $key, mixed $value, ?string $name = null, ?string $description = null): void
     {
         [$mainKey, $nestedKey] = self::splitKey($key);
 
