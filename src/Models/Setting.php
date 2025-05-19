@@ -7,7 +7,6 @@ use OnaOnbir\OOSettings\Models\Traits\JsonCast;
 
 class Setting extends Model
 {
-
     protected $table;
 
     public function __construct(array $attributes = [])
