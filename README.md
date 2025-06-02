@@ -14,7 +14,7 @@
 ✅ Service + Trait based usage  
 ✅ Includes `oo_setting()` and `oo_setting_m()` helper functions
 
----
+---  
 
 ## ⚙️ Installation
 
