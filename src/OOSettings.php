@@ -8,14 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use OnaOnbir\OOSettings\Contracts\SettingsContract;
 use OnaOnbir\OOSettings\Contracts\CacheManagerContract;
+use OnaOnbir\OOSettings\Contracts\SettingsContract;
 use OnaOnbir\OOSettings\Contracts\ValidationServiceContract;
 use OnaOnbir\OOSettings\Events\SettingChanged;
 use OnaOnbir\OOSettings\Events\SettingChanging;
 use OnaOnbir\OOSettings\Events\SettingDeleted;
 use OnaOnbir\OOSettings\Events\SettingDeleting;
-use OnaOnbir\OOSettings\Exceptions\SettingOperationException;
 use OnaOnbir\OOSettings\Repositories\SettingRepository;
 
 /**
@@ -92,7 +91,7 @@ class OOSettings implements SettingsContract
             // Fallback to database
             $setting = $this->repository->findGlobal($mainKey);
 
-            if (!$setting) {
+            if (! $setting) {
                 return $default;
             }
 
@@ -103,6 +102,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('get', $key, $e);
+
             return $default;
         }
     }
@@ -135,6 +135,7 @@ class OOSettings implements SettingsContract
                     $this->logInfo('set_cancelled', $key, [
                         'reason' => $event->getCancellationReason(),
                     ]);
+
                     return false;
                 }
             }
@@ -188,7 +189,7 @@ class OOSettings implements SettingsContract
 
             $setting = $this->repository->findGlobal($mainKey);
 
-            if (!$setting) {
+            if (! $setting) {
                 return false;
             }
 
@@ -203,6 +204,7 @@ class OOSettings implements SettingsContract
                     $this->logInfo('forget_cancelled', $key, [
                         'reason' => $event->getCancellationReason(),
                     ]);
+
                     return false;
                 }
             }
@@ -246,6 +248,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('forget', $key, $e);
+
             return false;
         }
     }
@@ -269,7 +272,7 @@ class OOSettings implements SettingsContract
             }
 
             // Check database
-            if (!$this->repository->existsGlobal($mainKey)) {
+            if (! $this->repository->existsGlobal($mainKey)) {
                 return false;
             }
 
@@ -283,6 +286,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('has', $key, $e);
+
             return false;
         }
     }
@@ -304,6 +308,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('all', '', $e);
+
             return [];
         }
     }
@@ -329,7 +334,7 @@ class OOSettings implements SettingsContract
             // Fallback to database
             $setting = $this->repository->findForModel($model, $mainKey);
 
-            if (!$setting) {
+            if (! $setting) {
                 return $default;
             }
 
@@ -340,6 +345,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('get_for_model', $key, $e, ['model' => get_class($model)]);
+
             return $default;
         }
     }
@@ -373,6 +379,7 @@ class OOSettings implements SettingsContract
                         'reason' => $event->getCancellationReason(),
                         'model' => get_class($model),
                     ]);
+
                     return false;
                 }
             }
@@ -428,7 +435,7 @@ class OOSettings implements SettingsContract
 
             $setting = $this->repository->findForModel($model, $mainKey);
 
-            if (!$setting) {
+            if (! $setting) {
                 return false;
             }
 
@@ -444,6 +451,7 @@ class OOSettings implements SettingsContract
                         'reason' => $event->getCancellationReason(),
                         'model' => get_class($model),
                     ]);
+
                     return false;
                 }
             }
@@ -488,6 +496,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('forget_for_model', $key, $e, ['model' => get_class($model)]);
+
             return false;
         }
     }
@@ -511,7 +520,7 @@ class OOSettings implements SettingsContract
             }
 
             // Check database
-            if (!$this->repository->existsForModel($model, $mainKey)) {
+            if (! $this->repository->existsForModel($model, $mainKey)) {
                 return false;
             }
 
@@ -525,6 +534,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('has_for_model', $key, $e, ['model' => get_class($model)]);
+
             return false;
         }
     }
@@ -546,6 +556,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('all_for_model', '', $e, ['model' => get_class($model)]);
+
             return [];
         }
     }
@@ -562,6 +573,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('set_many', '', $e, ['settings_count' => count($settings)]);
+
             return false;
         }
     }
@@ -581,6 +593,7 @@ class OOSettings implements SettingsContract
                 'model' => get_class($model),
                 'settings_count' => count($settings),
             ]);
+
             return false;
         }
     }
@@ -603,6 +616,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('clear', '', $e);
+
             return false;
         }
     }
@@ -625,6 +639,7 @@ class OOSettings implements SettingsContract
 
         } catch (\Throwable $e) {
             $this->logError('clear_for_model', '', $e, ['model' => get_class($model)]);
+
             return false;
         }
     }
@@ -638,10 +653,10 @@ class OOSettings implements SettingsContract
             return $this->cache->flush();
         } catch (\Throwable $e) {
             $this->logError('clear_cache', '', $e);
+
             return false;
         }
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -693,7 +708,7 @@ class OOSettings implements SettingsContract
      */
     protected function logError(string $operation, string $key, \Throwable $exception, array $context = []): void
     {
-        if (!$this->loggingEnabled) {
+        if (! $this->loggingEnabled) {
             return;
         }
 
@@ -710,7 +725,7 @@ class OOSettings implements SettingsContract
      */
     protected function logInfo(string $operation, string $key, array $context = []): void
     {
-        if (!$this->loggingEnabled || !config('oo-settings.logging.log_info', false)) {
+        if (! $this->loggingEnabled || ! config('oo-settings.logging.log_info', false)) {
             return;
         }
 

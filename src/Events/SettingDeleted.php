@@ -6,7 +6,7 @@ namespace OnaOnbir\OOSettings\Events;
 
 /**
  * Event fired after a setting has been successfully deleted.
- * 
+ *
  * This event can be used to:
  * - Log the setting deletion
  * - Clear related caches

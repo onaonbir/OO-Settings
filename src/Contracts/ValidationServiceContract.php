@@ -6,7 +6,7 @@ namespace OnaOnbir\OOSettings\Contracts;
 
 /**
  * Validation Service Contract for settings validation.
- * 
+ *
  * Provides comprehensive validation for setting keys and values
  * with support for custom rules and sanitization.
  */
@@ -15,9 +15,9 @@ interface ValidationServiceContract
     /**
      * Validate a setting key.
      *
-     * @param string $key The setting key
+     * @param  string  $key  The setting key
      * @return bool True if valid
-     * 
+     *
      * @throws \OnaOnbir\OOSettings\Exceptions\InvalidKeyException
      */
     public function validateKey(string $key): bool;
@@ -25,10 +25,10 @@ interface ValidationServiceContract
     /**
      * Validate a setting value.
      *
-     * @param mixed $value The setting value
-     * @param array<string, mixed> $rules Validation rules
+     * @param  mixed  $value  The setting value
+     * @param  array<string, mixed>  $rules  Validation rules
      * @return bool True if valid
-     * 
+     *
      * @throws \OnaOnbir\OOSettings\Exceptions\InvalidValueException
      */
     public function validateValue(mixed $value, array $rules = []): bool;
@@ -36,7 +36,7 @@ interface ValidationServiceContract
     /**
      * Sanitize a setting key.
      *
-     * @param string $key The setting key
+     * @param  string  $key  The setting key
      * @return string Sanitized key
      */
     public function sanitizeKey(string $key): string;
@@ -44,7 +44,7 @@ interface ValidationServiceContract
     /**
      * Sanitize a setting value.
      *
-     * @param mixed $value The setting value
+     * @param  mixed  $value  The setting value
      * @return mixed Sanitized value
      */
     public function sanitizeValue(mixed $value): mixed;
@@ -52,7 +52,7 @@ interface ValidationServiceContract
     /**
      * Check if a key matches reserved patterns.
      *
-     * @param string $key The setting key
+     * @param  string  $key  The setting key
      * @return bool True if key is reserved
      */
     public function isReservedKey(string $key): bool;
@@ -60,7 +60,7 @@ interface ValidationServiceContract
     /**
      * Get validation rules for a specific key.
      *
-     * @param string $key The setting key
+     * @param  string  $key  The setting key
      * @return array<string, mixed> Validation rules
      */
     public function getRulesForKey(string $key): array;
@@ -68,18 +68,17 @@ interface ValidationServiceContract
     /**
      * Set validation rules for a key pattern.
      *
-     * @param string $pattern Key pattern (supports wildcards)
-     * @param array<string, mixed> $rules Validation rules
-     * @return void
+     * @param  string  $pattern  Key pattern (supports wildcards)
+     * @param  array<string, mixed>  $rules  Validation rules
      */
     public function setRulesForPattern(string $pattern, array $rules): void;
 
     /**
      * Validate multiple settings at once.
      *
-     * @param array<string, mixed> $settings Key-value pairs
+     * @param  array<string, mixed>  $settings  Key-value pairs
      * @return bool True if all are valid
-     * 
+     *
      * @throws \OnaOnbir\OOSettings\Exceptions\ValidationException
      */
     public function validateMany(array $settings): bool;
@@ -93,8 +92,6 @@ interface ValidationServiceContract
 
     /**
      * Clear validation errors.
-     *
-     * @return void
      */
     public function clearErrors(): void;
 }

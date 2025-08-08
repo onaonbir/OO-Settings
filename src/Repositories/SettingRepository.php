@@ -6,12 +6,12 @@ namespace OnaOnbir\OOSettings\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use OnaOnbir\OOSettings\Models\Setting;
 use OnaOnbir\OOSettings\Exceptions\SettingOperationException;
+use OnaOnbir\OOSettings\Models\Setting;
 
 /**
  * Repository for managing setting data operations.
- * 
+ *
  * Provides optimized database operations with transaction support,
  * bulk operations, and efficient querying strategies.
  */
@@ -103,7 +103,7 @@ class SettingRepository
                         'description' => $description,
                     ]
                 );
-                
+
                 return $setting;
             });
         } catch (\Throwable $e) {
@@ -135,7 +135,7 @@ class SettingRepository
                         'description' => $description,
                     ]
                 );
-                
+
                 return $setting;
             });
         } catch (\Throwable $e) {
@@ -216,8 +216,7 @@ class SettingRepository
     /**
      * Bulk create or update global settings.
      *
-     * @param array<string, mixed> $settings Key-value pairs
-     * @return bool
+     * @param  array<string, mixed>  $settings  Key-value pairs
      */
     public function bulkCreateOrUpdateGlobal(array $settings, ?string $name = null, ?string $description = null): bool
     {
@@ -226,6 +225,7 @@ class SettingRepository
                 foreach ($settings as $key => $value) {
                     $this->createOrUpdateGlobal($key, $value, $name, $description);
                 }
+
                 return true;
             });
         } catch (\Throwable $e) {
@@ -236,8 +236,7 @@ class SettingRepository
     /**
      * Bulk create or update model-specific settings.
      *
-     * @param array<string, mixed> $settings Key-value pairs
-     * @return bool
+     * @param  array<string, mixed>  $settings  Key-value pairs
      */
     public function bulkCreateOrUpdateForModel(
         Model $model,
@@ -250,6 +249,7 @@ class SettingRepository
                 foreach ($settings as $key => $value) {
                     $this->createOrUpdateForModel($model, $key, $value, $name, $description);
                 }
+
                 return true;
             });
         } catch (\Throwable $e) {
@@ -326,10 +326,10 @@ class SettingRepository
 
         if ($model) {
             $query->where('settingable_type', get_class($model))
-                  ->where('settingable_id', $model->getKey());
+                ->where('settingable_id', $model->getKey());
         } else {
             $query->whereNull('settingable_type')
-                  ->whereNull('settingable_id');
+                ->whereNull('settingable_id');
         }
 
         return $query->get();

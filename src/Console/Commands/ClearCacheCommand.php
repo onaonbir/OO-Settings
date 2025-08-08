@@ -34,7 +34,7 @@ class ClearCacheCommand extends Command
 
         try {
             $cacheManager = $settings->getCacheManager();
-            
+
             if ($this->option('global')) {
                 // Clear only global cache
                 $success = $cacheManager->invalidateGlobal();
@@ -43,12 +43,13 @@ class ClearCacheCommand extends Command
                 // Clear model-specific cache
                 $modelClass = $this->option('model');
                 $modelId = $this->option('id');
-                
-                if (!$modelId) {
+
+                if (! $modelId) {
                     $this->error('Model ID is required when clearing model-specific cache.');
+
                     return 1;
                 }
-                
+
                 $success = $cacheManager->invalidateModel($modelClass, $modelId);
                 $this->info("Cache cleared for {$modelClass}#{$modelId}");
             } else {
@@ -57,16 +58,19 @@ class ClearCacheCommand extends Command
                 $this->info('All OOSettings cache cleared.');
             }
 
-            if (!$success) {
+            if (! $success) {
                 $this->error('Failed to clear cache.');
+
                 return 1;
             }
 
             $this->line('<info>✓</info> Cache cleared successfully.');
+
             return 0;
-            
+
         } catch (\Exception $e) {
-            $this->error('Error clearing cache: ' . $e->getMessage());
+            $this->error('Error clearing cache: '.$e->getMessage());
+
             return 1;
         }
     }

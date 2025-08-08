@@ -12,7 +12,7 @@ use OnaOnbir\OOSettings\Exceptions\InvalidValueException;
 
 /**
  * Comprehensive validation service for OOSettings.
- * 
+ *
  * Provides robust validation for keys and values with customizable rules
  * and sanitization capabilities.
  */
@@ -89,7 +89,7 @@ class ValidationService implements ValidationServiceContract
         }
 
         // Check for invalid characters
-        if (!preg_match($this->allowedKeyChars, $key)) {
+        if (! preg_match($this->allowedKeyChars, $key)) {
             $invalidChars = $this->findInvalidCharacters($key);
             throw InvalidKeyException::invalidCharacters($key, $invalidChars);
         }
@@ -121,7 +121,7 @@ class ValidationService implements ValidationServiceContract
         }
 
         // Check if value is serializable
-        if (!$this->isSerializable($value)) {
+        if (! $this->isSerializable($value)) {
             throw InvalidValueException::notSerializable($value);
         }
 
@@ -131,9 +131,9 @@ class ValidationService implements ValidationServiceContract
         }
 
         // Apply custom validation rules
-        if (!empty($rules)) {
+        if (! empty($rules)) {
             $validator = Validator::make(['value' => $value], ['value' => $rules]);
-            
+
             if ($validator->fails()) {
                 throw InvalidValueException::validationFailed($value, $validator->errors()->all());
             }
@@ -149,16 +149,16 @@ class ValidationService implements ValidationServiceContract
     {
         // Remove leading/trailing whitespace
         $key = trim($key);
-        
+
         // Convert to lowercase for consistency
         $key = strtolower($key);
-        
+
         // Replace multiple consecutive dots with single dot
         $key = preg_replace('/\.{2,}/', '.', $key);
-        
+
         // Remove leading/trailing dots
         $key = trim($key, '.');
-        
+
         return $key;
     }
 
@@ -170,21 +170,21 @@ class ValidationService implements ValidationServiceContract
         if (is_string($value)) {
             // Trim whitespace
             $value = trim($value);
-            
+
             // Remove null bytes
             $value = str_replace("\0", '', $value);
-            
+
             // Optionally sanitize HTML if enabled
             if (config('oo-settings.validation.sanitize_html', true)) {
                 $value = htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
             }
         }
-        
+
         if (is_array($value)) {
             // Recursively sanitize array values
             return array_map([$this, 'sanitizeValue'], $value);
         }
-        
+
         return $value;
     }
 
@@ -198,7 +198,7 @@ class ValidationService implements ValidationServiceContract
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -212,7 +212,7 @@ class ValidationService implements ValidationServiceContract
                 return $rules;
             }
         }
-        
+
         return [];
     }
 
@@ -235,7 +235,7 @@ class ValidationService implements ValidationServiceContract
         foreach ($settings as $key => $value) {
             try {
                 $this->validateKey($key);
-                
+
                 $rules = $this->getRulesForKey($key);
                 $this->validateValue($value, $rules);
             } catch (InvalidKeyException $e) {
@@ -284,14 +284,14 @@ class ValidationService implements ValidationServiceContract
     {
         $allowedChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-';
         $invalidChars = [];
-        
+
         for ($i = 0; $i < strlen($key); $i++) {
             $char = $key[$i];
             if (strpos($allowedChars, $char) === false) {
                 $invalidChars[] = $char;
             }
         }
-        
+
         return array_unique($invalidChars);
     }
 
@@ -304,12 +304,12 @@ class ValidationService implements ValidationServiceContract
         if (strpos($key, '..') !== false) {
             return true;
         }
-        
+
         // Check for leading/trailing dots
         if (str_starts_with($key, '.') || str_ends_with($key, '.')) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -321,11 +321,11 @@ class ValidationService implements ValidationServiceContract
         if (is_string($value)) {
             return strlen($value);
         }
-        
+
         if (is_array($value) || is_object($value)) {
             return strlen(json_encode($value) ?: '');
         }
-        
+
         return strlen((string) $value);
     }
 
@@ -336,6 +336,7 @@ class ValidationService implements ValidationServiceContract
     {
         try {
             json_encode($value, JSON_THROW_ON_ERROR);
+
             return true;
         } catch (\JsonException) {
             return false;
@@ -347,15 +348,16 @@ class ValidationService implements ValidationServiceContract
      */
     protected function hasCircularReference(mixed $value): bool
     {
-        if (!is_array($value) && !is_object($value)) {
+        if (! is_array($value) && ! is_object($value)) {
             return false;
         }
-        
+
         try {
             json_encode($value, JSON_THROW_ON_ERROR);
+
             return false;
         } catch (\JsonException $e) {
-            return str_contains($e->getMessage(), 'recursion') || 
+            return str_contains($e->getMessage(), 'recursion') ||
                    str_contains($e->getMessage(), 'circular');
         }
     }

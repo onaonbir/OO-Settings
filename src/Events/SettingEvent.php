@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Base event for all OOSettings events.
- * 
+ *
  * Provides common functionality and structure for setting-related events.
  */
 abstract class SettingEvent
@@ -48,10 +48,10 @@ abstract class SettingEvent
     /**
      * Create a new setting event.
      *
-     * @param string $key Setting key
-     * @param mixed $value Setting value
-     * @param Model|null $model Model instance
-     * @param array<string, mixed> $context Additional context
+     * @param  string  $key  Setting key
+     * @param  mixed  $value  Setting value
+     * @param  Model|null  $model  Model instance
+     * @param  array<string, mixed>  $context  Additional context
      */
     public function __construct(string $key, mixed $value, ?Model $model = null, array $context = [])
     {

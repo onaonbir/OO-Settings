@@ -6,7 +6,7 @@ namespace OnaOnbir\OOSettings\Exceptions;
 
 /**
  * Exception thrown when validation fails for multiple settings.
- * 
+ *
  * This exception aggregates multiple validation errors and provides
  * detailed information about each failure.
  */
@@ -15,14 +15,13 @@ class ValidationException extends OOSettingsException
     /**
      * Create a new validation exception with multiple errors.
      *
-     * @param array<string, array<string>> $errors Validation errors by key
-     * @return static
+     * @param  array<string, array<string>>  $errors  Validation errors by key
      */
     public static function withErrors(array $errors): static
     {
         $errorCount = array_sum(array_map('count', $errors));
         $message = "Validation failed for {$errorCount} setting(s)";
-        
+
         return new static($message, 422, null, [
             'errors' => $errors,
             'error_count' => $errorCount,

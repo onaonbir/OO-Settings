@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Event fired after a setting has been successfully set.
- * 
+ *
  * This event can be used to:
  * - Log the setting change
  * - Clear related caches
@@ -30,11 +30,11 @@ class SettingChanged extends SettingEvent
     /**
      * Create a new setting changed event.
      *
-     * @param string $key Setting key
-     * @param mixed $newValue New setting value
-     * @param mixed $oldValue Old setting value
-     * @param Model|null $model Model instance
-     * @param array<string, mixed> $context Additional context
+     * @param  string  $key  Setting key
+     * @param  mixed  $newValue  New setting value
+     * @param  mixed  $oldValue  Old setting value
+     * @param  Model|null  $model  Model instance
+     * @param  array<string, mixed>  $context  Additional context
      */
     public function __construct(
         string $key,
@@ -61,7 +61,7 @@ class SettingChanged extends SettingEvent
      */
     public function wasUpdated(): bool
     {
-        return !$this->wasCreated;
+        return ! $this->wasCreated;
     }
 
     /**

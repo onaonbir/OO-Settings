@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Event fired when a setting is being set (before save).
- * 
+ *
  * This event can be used to:
  * - Validate the setting change
  * - Transform the value before saving
@@ -30,11 +30,11 @@ class SettingChanging extends SettingEvent
     /**
      * Create a new setting changing event.
      *
-     * @param string $key Setting key
-     * @param mixed $newValue New setting value
-     * @param mixed $oldValue Old setting value
-     * @param Model|null $model Model instance
-     * @param array<string, mixed> $context Additional context
+     * @param  string  $key  Setting key
+     * @param  mixed  $newValue  New setting value
+     * @param  mixed  $oldValue  Old setting value
+     * @param  Model|null  $model  Model instance
+     * @param  array<string, mixed>  $context  Additional context
      */
     public function __construct(
         string $key,
@@ -50,8 +50,7 @@ class SettingChanging extends SettingEvent
     /**
      * Cancel the setting operation.
      *
-     * @param string $reason Reason for cancellation
-     * @return void
+     * @param  string  $reason  Reason for cancellation
      */
     public function cancel(string $reason = 'Operation cancelled by event listener'): void
     {

@@ -8,7 +8,7 @@ use Exception;
 
 /**
  * Base exception for OOSettings package.
- * 
+ *
  * All package-specific exceptions should extend this class
  * to provide consistent error handling and logging.
  */
@@ -24,10 +24,10 @@ class OOSettingsException extends Exception
     /**
      * Create a new OOSettings exception.
      *
-     * @param string $message Exception message
-     * @param int $code Exception code
-     * @param \Throwable|null $previous Previous exception
-     * @param array<string, mixed> $context Additional context
+     * @param  string  $message  Exception message
+     * @param  int  $code  Exception code
+     * @param  \Throwable|null  $previous  Previous exception
+     * @param  array<string, mixed>  $context  Additional context
      */
     public function __construct(
         string $message = '',
@@ -52,12 +52,12 @@ class OOSettingsException extends Exception
     /**
      * Set additional context for the exception.
      *
-     * @param array<string, mixed> $context Context data
-     * @return static
+     * @param  array<string, mixed>  $context  Context data
      */
     public function withContext(array $context): static
     {
         $this->context = array_merge($this->context, $context);
+
         return $this;
     }
 

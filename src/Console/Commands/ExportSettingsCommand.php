@@ -36,19 +36,20 @@ class ExportSettingsCommand extends Command
     {
         $format = $this->option('format');
         $file = $this->argument('file') ?: $this->generateDefaultFilename($format);
-        
+
         $this->info("Exporting OOSettings to: <comment>{$file}</comment>");
 
         try {
             $data = $this->collectExportData($settings);
-            
+
             if (empty($data)) {
                 $this->warn('No settings found to export.');
+
                 return 0;
             }
 
             $exportedContent = $this->formatData($data, $format);
-            
+
             if ($this->option('compress')) {
                 $exportedContent = $this->compressData($exportedContent);
                 $file .= '.gz';
@@ -56,16 +57,17 @@ class ExportSettingsCommand extends Command
 
             Storage::disk('local')->put($file, $exportedContent);
 
-            $this->info("✓ Exported " . count($data) . " settings to: <info>{$file}</info>");
-            
+            $this->info('✓ Exported '.count($data)." settings to: <info>{$file}</info>");
+
             if ($this->option('include-meta')) {
                 $this->displayExportSummary($data);
             }
 
             return 0;
-            
+
         } catch (\Exception $e) {
-            $this->error('Export failed: ' . $e->getMessage());
+            $this->error('Export failed: '.$e->getMessage());
+
             return 1;
         }
     }
@@ -77,10 +79,10 @@ class ExportSettingsCommand extends Command
     {
         $data = [];
 
-        if ($this->option('global') || (!$this->option('model'))) {
+        if ($this->option('global') || (! $this->option('model'))) {
             // Export global settings
             $globalSettings = $settings->all();
-            
+
             foreach ($globalSettings as $key => $value) {
                 $data[] = [
                     'key' => $key,
@@ -114,15 +116,15 @@ class ExportSettingsCommand extends Command
      */
     protected function arrayToYaml(array $data): string
     {
-        $yaml = "# OOSettings Export\n# Generated: " . now()->toISOString() . "\n\n";
-        
+        $yaml = "# OOSettings Export\n# Generated: ".now()->toISOString()."\n\n";
+
         foreach ($data as $item) {
             $yaml .= "- key: \"{$item['key']}\"\n";
-            $yaml .= "  value: " . json_encode($item['value']) . "\n";
+            $yaml .= '  value: '.json_encode($item['value'])."\n";
             $yaml .= "  type: \"{$item['type']}\"\n";
             $yaml .= "  exported_at: \"{$item['exported_at']}\"\n\n";
         }
-        
+
         return $yaml;
     }
 
@@ -136,7 +138,7 @@ class ExportSettingsCommand extends Command
         }
 
         $csv = "key,value,type,model_class,model_id,exported_at\n";
-        
+
         foreach ($data as $item) {
             $value = is_string($item['value']) ? $item['value'] : json_encode($item['value']);
             $csv .= sprintf(
@@ -149,7 +151,7 @@ class ExportSettingsCommand extends Command
                 $item['exported_at']
             );
         }
-        
+
         return $csv;
     }
 
@@ -167,6 +169,7 @@ class ExportSettingsCommand extends Command
     protected function generateDefaultFilename(string $format): string
     {
         $timestamp = now()->format('Y-m-d_H-i-s');
+
         return "oo-settings-export_{$timestamp}.{$format}";
     }
 
@@ -175,9 +178,9 @@ class ExportSettingsCommand extends Command
      */
     protected function displayExportSummary(array $data): void
     {
-        $globalCount = count(array_filter($data, fn($item) => $item['type'] === 'global'));
+        $globalCount = count(array_filter($data, fn ($item) => $item['type'] === 'global'));
         $modelCount = count($data) - $globalCount;
-        
+
         $this->table(['Type', 'Count'], [
             ['Global Settings', $globalCount],
             ['Model Settings', $modelCount],

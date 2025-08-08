@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace OnaOnbir\OOSettings;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
-use OnaOnbir\OOSettings\Contracts\SettingsContract;
-use OnaOnbir\OOSettings\Contracts\CacheManagerContract;
-use OnaOnbir\OOSettings\Contracts\ValidationServiceContract;
-use OnaOnbir\OOSettings\Services\CacheManager;
-use OnaOnbir\OOSettings\Services\ValidationService;
-use OnaOnbir\OOSettings\Repositories\SettingRepository;
-use OnaOnbir\OOSettings\Models\Setting;
+use Illuminate\Support\ServiceProvider;
 use OnaOnbir\OOSettings\Console\Commands\ClearCacheCommand;
 use OnaOnbir\OOSettings\Console\Commands\ExportSettingsCommand;
 use OnaOnbir\OOSettings\Console\Commands\ImportSettingsCommand;
 use OnaOnbir\OOSettings\Console\Commands\WarmCacheCommand;
+use OnaOnbir\OOSettings\Contracts\CacheManagerContract;
+use OnaOnbir\OOSettings\Contracts\SettingsContract;
+use OnaOnbir\OOSettings\Contracts\ValidationServiceContract;
+use OnaOnbir\OOSettings\Models\Setting;
+use OnaOnbir\OOSettings\Repositories\SettingRepository;
+use OnaOnbir\OOSettings\Services\CacheManager;
+use OnaOnbir\OOSettings\Services\ValidationService;
 
 /**
  * Advanced OOSettings Service Provider with dependency injection,
@@ -42,10 +42,10 @@ class OOSettingsServiceProvider extends ServiceProvider
 
         // Register contracts and implementations
         $this->registerContracts();
-        
+
         // Register main service
         $this->registerOOSettings();
-        
+
         // Register repository
         $this->registerRepository();
     }
@@ -57,20 +57,20 @@ class OOSettingsServiceProvider extends ServiceProvider
     {
         // Load migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        
+
         // Register custom validation rules (after Laravel is fully booted)
         $this->registerValidationRules();
-        
+
         // Publish configuration and migrations
         $this->publishConfiguration();
         $this->publishMigrations();
-        
+
         // Register console commands
         $this->registerCommands();
-        
+
         // Boot additional features
         $this->bootFeatures();
-        
+
         // Cache warming if enabled
         $this->warmCacheIfEnabled();
     }
@@ -82,12 +82,12 @@ class OOSettingsServiceProvider extends ServiceProvider
     {
         // Cache Manager
         $this->app->singleton(CacheManagerContract::class, function ($app) {
-            return new CacheManager();
+            return new CacheManager;
         });
 
         // Validation Service
         $this->app->singleton(ValidationServiceContract::class, function ($app) {
-            return new ValidationService();
+            return new ValidationService;
         });
     }
 
@@ -106,7 +106,7 @@ class OOSettingsServiceProvider extends ServiceProvider
 
         // Also register as 'oo-settings' for easy access
         $this->app->alias(SettingsContract::class, 'oo-settings');
-        
+
         // Backward compatibility alias
         $this->app->alias(SettingsContract::class, OOSettings::class);
     }
@@ -117,7 +117,7 @@ class OOSettingsServiceProvider extends ServiceProvider
     protected function registerRepository(): void
     {
         $this->app->singleton(SettingRepository::class, function ($app) {
-            return new SettingRepository(new Setting());
+            return new SettingRepository(new Setting);
         });
     }
 
@@ -127,15 +127,16 @@ class OOSettingsServiceProvider extends ServiceProvider
     protected function registerValidationRules(): void
     {
         // Only register if validator is available
-        if (!$this->app->bound('validator')) {
+        if (! $this->app->bound('validator')) {
             return;
         }
-        
+
         try {
             // Extend Laravel's validator with custom rules
             Validator::extend('setting_key', function ($attribute, $value, $parameters, $validator) {
                 try {
                     app(ValidationServiceContract::class)->validateKey($value);
+
                     return true;
                 } catch (\Exception) {
                     return false;
@@ -145,6 +146,7 @@ class OOSettingsServiceProvider extends ServiceProvider
             Validator::extend('setting_value', function ($attribute, $value, $parameters, $validator) {
                 try {
                     app(ValidationServiceContract::class)->validateValue($value);
+
                     return true;
                 } catch (\Exception) {
                     return false;
@@ -231,11 +233,11 @@ class OOSettingsServiceProvider extends ServiceProvider
      */
     protected function warmCacheIfEnabled(): void
     {
-        if (!config('oo-settings.performance.cache_warming.enabled', false)) {
+        if (! config('oo-settings.performance.cache_warming.enabled', false)) {
             return;
         }
 
-        if (!config('oo-settings.performance.cache_warming.on_boot', false)) {
+        if (! config('oo-settings.performance.cache_warming.on_boot', false)) {
             return;
         }
 
@@ -278,10 +280,10 @@ class OOSettingsServiceProvider extends ServiceProvider
     {
         // Load web routes
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-        
+
         // Load views
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'oo-settings');
-        
+
         // Publish views
         $this->publishes([
             __DIR__.'/../resources/views' => resource_path('views/vendor/oo-settings'),
@@ -313,7 +315,7 @@ class OOSettingsServiceProvider extends ServiceProvider
         foreach ($patterns as $pattern) {
             try {
                 $settings = $repository->searchByKeyPattern($pattern);
-                
+
                 foreach ($settings as $setting) {
                     // Pre-load into cache
                     $settingsService->get($setting->key);

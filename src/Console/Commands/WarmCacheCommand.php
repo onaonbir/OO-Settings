@@ -30,8 +30,9 @@ class WarmCacheCommand extends Command
      */
     public function handle(SettingsContract $settings): int
     {
-        if (!config('oo-settings.performance.cache_warming.enabled') && !$this->option('force')) {
+        if (! config('oo-settings.performance.cache_warming.enabled') && ! $this->option('force')) {
             $this->warn('Cache warming is disabled. Use --force to override.');
+
             return 1;
         }
 
@@ -39,7 +40,7 @@ class WarmCacheCommand extends Command
 
         try {
             $patterns = $this->option('pattern') ?: config('oo-settings.performance.cache_warming.patterns', []);
-            
+
             if (empty($patterns)) {
                 $patterns = ['*']; // Default to all settings
             }
@@ -49,7 +50,7 @@ class WarmCacheCommand extends Command
 
             foreach ($patterns as $pattern) {
                 $this->line("Warming cache for pattern: <comment>{$pattern}</comment>");
-                
+
                 if ($this->option('global')) {
                     $foundSettings = $repository->searchByKeyPattern($pattern);
                 } else {
@@ -64,9 +65,10 @@ class WarmCacheCommand extends Command
                         // For model settings, we'd need the actual model instance
                         // This is a simplified implementation
                         $this->line("  Skipping model setting: {$setting->key}");
+
                         continue;
                     }
-                    
+
                     $warmedCount++;
                     $this->line("  ✓ Warmed: <info>{$setting->key}</info>");
                 }
@@ -74,20 +76,21 @@ class WarmCacheCommand extends Command
 
             $this->line('');
             $this->info("Cache warming completed. Warmed {$warmedCount} settings.");
-            
+
             // Show cache statistics
             $stats = $settings->getCacheManager()->stats();
             $this->table(['Metric', 'Value'], [
-                ['Hit Ratio', $stats['hit_ratio'] . '%'],
+                ['Hit Ratio', $stats['hit_ratio'].'%'],
                 ['Hits', $stats['hits']],
                 ['Misses', $stats['misses']],
                 ['Writes', $stats['writes']],
             ]);
 
             return 0;
-            
+
         } catch (\Exception $e) {
-            $this->error('Error warming cache: ' . $e->getMessage());
+            $this->error('Error warming cache: '.$e->getMessage());
+
             return 1;
         }
     }

@@ -35,9 +35,10 @@ class ImportSettingsCommand extends Command
     {
         $file = $this->argument('file');
         $format = $this->option('format');
-        
-        if (!Storage::disk('local')->exists($file)) {
+
+        if (! Storage::disk('local')->exists($file)) {
             $this->error("File not found: {$file}");
+
             return 1;
         }
 
@@ -45,20 +46,22 @@ class ImportSettingsCommand extends Command
 
         try {
             $content = Storage::disk('local')->get($file);
-            
+
             // Check if file is compressed
             if (str_ends_with($file, '.gz')) {
                 $content = gzdecode($content);
                 if ($content === false) {
                     $this->error('Failed to decompress file.');
+
                     return 1;
                 }
             }
 
             $data = $this->parseData($content, $format);
-            
+
             if (empty($data)) {
                 $this->warn('No settings found in the import file.');
+
                 return 0;
             }
 
@@ -66,18 +69,21 @@ class ImportSettingsCommand extends Command
                 return $this->showDryRun($data);
             }
 
-            if (!$this->option('force') && !$this->confirm("Import {$this->countSettings($data)} setting(s)?")) {
+            if (! $this->option('force') && ! $this->confirm("Import {$this->countSettings($data)} setting(s)?")) {
                 $this->info('Import cancelled.');
+
                 return 0;
             }
 
             $imported = $this->importSettings($settings, $data);
 
             $this->info("✓ Successfully imported {$imported} settings.");
+
             return 0;
-            
+
         } catch (\Exception $e) {
-            $this->error('Import failed: ' . $e->getMessage());
+            $this->error('Import failed: '.$e->getMessage());
+
             return 1;
         }
     }
@@ -101,11 +107,11 @@ class ImportSettingsCommand extends Command
     protected function parseJson(string $content): array
     {
         $data = json_decode($content, true);
-        
+
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException('Invalid JSON: ' . json_last_error_msg());
+            throw new \InvalidArgumentException('Invalid JSON: '.json_last_error_msg());
         }
-        
+
         return $data;
     }
 
@@ -118,14 +124,14 @@ class ImportSettingsCommand extends Command
         $lines = explode("\n", $content);
         $data = [];
         $current = null;
-        
+
         foreach ($lines as $line) {
             $line = trim($line);
-            
+
             if (empty($line) || str_starts_with($line, '#')) {
                 continue;
             }
-            
+
             if (str_starts_with($line, '- key:')) {
                 if ($current) {
                     $data[] = $current;
@@ -138,11 +144,11 @@ class ImportSettingsCommand extends Command
                 $current['type'] = trim(str_replace(['type:', '"'], '', $line));
             }
         }
-        
+
         if ($current) {
             $data[] = $current;
         }
-        
+
         return $data;
     }
 
@@ -154,23 +160,23 @@ class ImportSettingsCommand extends Command
         $lines = explode("\n", trim($content));
         $headers = str_getcsv(array_shift($lines));
         $data = [];
-        
+
         foreach ($lines as $line) {
             if (empty(trim($line))) {
                 continue;
             }
-            
+
             $values = str_getcsv($line);
             $item = array_combine($headers, $values);
-            
+
             // Parse JSON values if needed
             if (isset($item['value']) && $this->isJson($item['value'])) {
                 $item['value'] = json_decode($item['value'], true);
             }
-            
+
             $data[] = $item;
         }
-        
+
         return $data;
     }
 
@@ -180,6 +186,7 @@ class ImportSettingsCommand extends Command
     protected function isJson(string $string): bool
     {
         json_decode($string);
+
         return json_last_error() === JSON_ERROR_NONE;
     }
 
@@ -190,11 +197,11 @@ class ImportSettingsCommand extends Command
     {
         $this->info('DRY RUN - No changes will be made');
         $this->line('');
-        
-        $globalSettings = array_filter($data, fn($item) => ($item['type'] ?? 'global') === 'global');
-        $modelSettings = array_filter($data, fn($item) => ($item['type'] ?? 'global') !== 'global');
-        
-        if (!empty($globalSettings)) {
+
+        $globalSettings = array_filter($data, fn ($item) => ($item['type'] ?? 'global') === 'global');
+        $modelSettings = array_filter($data, fn ($item) => ($item['type'] ?? 'global') !== 'global');
+
+        if (! empty($globalSettings)) {
             $this->info('Global Settings to Import:');
             foreach ($globalSettings as $item) {
                 $value = is_array($item['value']) ? json_encode($item['value']) : $item['value'];
@@ -202,8 +209,8 @@ class ImportSettingsCommand extends Command
             }
             $this->line('');
         }
-        
-        if (!empty($modelSettings)) {
+
+        if (! empty($modelSettings)) {
             $this->info('Model Settings to Import:');
             foreach ($modelSettings as $item) {
                 $value = is_array($item['value']) ? json_encode($item['value']) : $item['value'];
@@ -212,13 +219,13 @@ class ImportSettingsCommand extends Command
                 $this->line("  • {$model}#{$id}: {$item['key']} = {$value}");
             }
         }
-        
+
         $this->table(['Type', 'Count'], [
             ['Global Settings', count($globalSettings)],
             ['Model Settings', count($modelSettings)],
             ['Total', count($data)],
         ]);
-        
+
         return 0;
     }
 
@@ -237,19 +244,19 @@ class ImportSettingsCommand extends Command
     {
         $imported = 0;
         $progressBar = $this->output->createProgressBar(count($data));
-        
+
         foreach ($data as $item) {
             try {
                 $key = $item['key'];
                 $value = $item['value'];
                 $type = $item['type'] ?? 'global';
-                
+
                 if ($type === 'global') {
                     if ($this->option('merge') && $settings->has($key)) {
                         // Skip existing settings when merging
                         continue;
                     }
-                    
+
                     $settings->set($key, $value);
                     $imported++;
                 } else {
@@ -257,16 +264,16 @@ class ImportSettingsCommand extends Command
                     // This is a simplified implementation
                     $this->warn("Skipping model setting: {$key}");
                 }
-                
+
                 $progressBar->advance();
             } catch (\Exception $e) {
                 $this->error("Failed to import {$item['key']}: {$e->getMessage()}");
             }
         }
-        
+
         $progressBar->finish();
         $this->line('');
-        
+
         return $imported;
     }
 }

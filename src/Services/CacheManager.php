@@ -10,7 +10,7 @@ use OnaOnbir\OOSettings\Contracts\CacheManagerContract;
 
 /**
  * Advanced cache manager for OOSettings with tagging, TTL, and invalidation strategies.
- * 
+ *
  * Provides high-performance caching with intelligent invalidation and warming capabilities.
  */
 class CacheManager implements CacheManagerContract
@@ -64,27 +64,27 @@ class CacheManager implements CacheManagerContract
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return $default;
         }
 
         try {
             $cacheKey = $this->buildKey($key);
             $value = $this->cache->get($cacheKey, $default);
-            
+
             if ($value !== $default) {
                 $this->stats['hits']++;
             } else {
                 $this->stats['misses']++;
             }
-            
+
             return $value;
         } catch (\Throwable $e) {
             Log::warning('Cache get operation failed', [
                 'key' => $key,
                 'error' => $e->getMessage(),
             ]);
-            
+
             return $default;
         }
     }
@@ -94,33 +94,33 @@ class CacheManager implements CacheManagerContract
      */
     public function put(string $key, mixed $value, ?int $ttl = null): bool
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return true;
         }
 
         try {
             $cacheKey = $this->buildKey($key);
             $cacheTtl = $ttl ?? $this->defaultTtl;
-            
+
             $tags = $this->extractTags($key);
-            
-            if (!empty($tags) && method_exists($this->cache, 'tags')) {
+
+            if (! empty($tags) && method_exists($this->cache, 'tags')) {
                 $result = $this->cache->tags($tags)->put($cacheKey, $value, $cacheTtl);
             } else {
                 $result = $this->cache->put($cacheKey, $value, $cacheTtl);
             }
-            
+
             if ($result) {
                 $this->stats['writes']++;
             }
-            
+
             return $result;
         } catch (\Throwable $e) {
             Log::warning('Cache put operation failed', [
                 'key' => $key,
                 'error' => $e->getMessage(),
             ]);
-            
+
             return false;
         }
     }
@@ -130,7 +130,7 @@ class CacheManager implements CacheManagerContract
      */
     public function has(string $key): bool
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return false;
         }
 
@@ -141,7 +141,7 @@ class CacheManager implements CacheManagerContract
                 'key' => $key,
                 'error' => $e->getMessage(),
             ]);
-            
+
             return false;
         }
     }
@@ -151,24 +151,24 @@ class CacheManager implements CacheManagerContract
      */
     public function forget(string $key): bool
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return true;
         }
 
         try {
             $result = $this->cache->forget($this->buildKey($key));
-            
+
             if ($result) {
                 $this->stats['deletes']++;
             }
-            
+
             return $result;
         } catch (\Throwable $e) {
             Log::warning('Cache forget operation failed', [
                 'key' => $key,
                 'error' => $e->getMessage(),
             ]);
-            
+
             return false;
         }
     }
@@ -178,7 +178,7 @@ class CacheManager implements CacheManagerContract
      */
     public function flush(array $tags = []): bool
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return true;
         }
 
@@ -193,18 +193,18 @@ class CacheManager implements CacheManagerContract
                 // Fallback: clear entire cache if tagging not supported
                 $result = $this->cache->flush();
             }
-            
+
             if ($result) {
                 $this->stats['flushes']++;
             }
-            
+
             return $result;
         } catch (\Throwable $e) {
             Log::warning('Cache flush operation failed', [
                 'tags' => $tags,
                 'error' => $e->getMessage(),
             ]);
-            
+
             return false;
         }
     }
@@ -267,18 +267,18 @@ class CacheManager implements CacheManagerContract
      */
     public function warmUp(array $data): bool
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return true;
         }
 
         $success = true;
-        
+
         foreach ($data as $key => $value) {
-            if (!$this->put($key, $value)) {
+            if (! $this->put($key, $value)) {
                 $success = false;
             }
         }
-        
+
         return $success;
     }
 
@@ -314,14 +314,14 @@ class CacheManager implements CacheManagerContract
         if (str_starts_with($key, 'global:')) {
             return $this->globalTags();
         }
-        
+
         if (str_starts_with($key, 'model:')) {
             $parts = explode(':', $key);
             if (count($parts) >= 4) {
                 return $this->modelTags($parts[1], $parts[2]);
             }
         }
-        
+
         return ['oo_settings'];
     }
 
@@ -331,11 +331,11 @@ class CacheManager implements CacheManagerContract
     protected function calculateHitRatio(): float
     {
         $total = $this->stats['hits'] + $this->stats['misses'];
-        
+
         if ($total === 0) {
             return 0.0;
         }
-        
+
         return round(($this->stats['hits'] / $total) * 100, 2);
     }
 }

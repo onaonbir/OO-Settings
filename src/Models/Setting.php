@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace OnaOnbir\OOSettings\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
 use OnaOnbir\OOSettings\Models\Traits\JsonCast;
 
 /**
  * Enhanced Setting model with advanced features and optimizations.
- * 
+ *
  * @property int $id
  * @property string|null $name
  * @property string|null $description
@@ -47,7 +47,7 @@ class Setting extends Model
      */
     protected $fillable = [
         'name',
-        'description', 
+        'description',
         'key',
         'value',
         'settingable_type',
@@ -95,7 +95,7 @@ class Setting extends Model
     public function scopeGlobal(Builder $query): Builder
     {
         return $query->whereNull('settingable_type')
-                    ->whereNull('settingable_id');
+            ->whereNull('settingable_id');
     }
 
     /**
@@ -104,7 +104,7 @@ class Setting extends Model
     public function scopeForModels(Builder $query): Builder
     {
         return $query->whereNotNull('settingable_type')
-                    ->whereNotNull('settingable_id');
+            ->whereNotNull('settingable_id');
     }
 
     /**
@@ -121,7 +121,7 @@ class Setting extends Model
     public function scopeForModelInstance(Builder $query, Model $model): Builder
     {
         return $query->where('settingable_type', get_class($model))
-                    ->where('settingable_id', $model->getKey());
+            ->where('settingable_id', $model->getKey());
     }
 
     /**
@@ -130,6 +130,7 @@ class Setting extends Model
     public function scopeKeyPattern(Builder $query, string $pattern): Builder
     {
         $pattern = str_replace(['*', '?'], ['%', '_'], $pattern);
+
         return $query->where('key', 'LIKE', $pattern);
     }
 
@@ -192,7 +193,7 @@ class Setting extends Model
      */
     public function getIsModelSpecificAttribute(): bool
     {
-        return !$this->is_global;
+        return ! $this->is_global;
     }
 
     /**
@@ -218,12 +219,12 @@ class Setting extends Model
     {
         $bytes = $this->size;
         $units = ['B', 'KB', 'MB', 'GB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /*
@@ -237,7 +238,8 @@ class Setting extends Model
      */
     public function matchesPattern(string $pattern): bool
     {
-        $regex = '/^' . str_replace(['*', '?'], ['.*', '.'], preg_quote($pattern, '/')) . '$/i';
+        $regex = '/^'.str_replace(['*', '?'], ['.*', '.'], preg_quote($pattern, '/')).'$/i';
+
         return preg_match($regex, $this->key) === 1;
     }
 
@@ -322,7 +324,7 @@ class Setting extends Model
             $this->only(['name', 'description', 'key', 'value']),
             $overrides
         );
-        
+
         return static::create($attributes);
     }
 
@@ -335,7 +337,7 @@ class Setting extends Model
             'key' => $this->key,
             'value' => $this->value,
         ];
-        
+
         if ($includeMetadata) {
             $data = array_merge($data, [
                 'name' => $this->name,
@@ -349,7 +351,7 @@ class Setting extends Model
                 'size' => $this->size,
             ]);
         }
-        
+
         return $data;
     }
 
@@ -383,7 +385,7 @@ class Setting extends Model
         $totalCount = static::count();
         $globalCount = static::global()->count();
         $modelCount = static::forModels()->count();
-        
+
         return [
             'total_settings' => $totalCount,
             'global_settings' => $globalCount,
@@ -406,23 +408,24 @@ class Setting extends Model
     {
         $deletedCount = 0;
         $modelSettings = static::forModels()->get()->groupBy('settingable_type');
-        
+
         foreach ($modelSettings as $modelClass => $settings) {
-            if (!class_exists($modelClass)) {
+            if (! class_exists($modelClass)) {
                 // Delete settings for non-existent model classes
                 $deletedCount += static::where('settingable_type', $modelClass)->delete();
+
                 continue;
             }
-            
+
             $existingIds = $modelClass::pluck('id')->toArray();
             $orphanedSettings = $settings->whereNotIn('settingable_id', $existingIds);
-            
+
             foreach ($orphanedSettings as $setting) {
                 $setting->delete();
                 $deletedCount++;
             }
         }
-        
+
         return $deletedCount;
     }
 
@@ -432,31 +435,31 @@ class Setting extends Model
     public static function import(array $data, bool $merge = false): int
     {
         $importedCount = 0;
-        
+
         foreach ($data as $item) {
-            if (!isset($item['key'])) {
+            if (! isset($item['key'])) {
                 continue;
             }
-            
+
             $attributes = [
                 'key' => $item['key'],
                 'settingable_type' => $item['model_class'] ?? null,
                 'settingable_id' => $item['model_id'] ?? null,
             ];
-            
+
             if ($merge && static::where($attributes)->exists()) {
                 continue; // Skip existing settings when merging
             }
-            
+
             static::updateOrCreate($attributes, [
                 'value' => $item['value'],
                 'name' => $item['name'] ?? null,
                 'description' => $item['description'] ?? null,
             ]);
-            
+
             $importedCount++;
         }
-        
+
         return $importedCount;
     }
 
@@ -472,12 +475,12 @@ class Setting extends Model
     protected static function boot(): void
     {
         parent::boot();
-        
+
         // Clear related caches when settings are modified
         static::saved(function (Setting $setting) {
             $setting->clearRelatedCaches();
         });
-        
+
         static::deleted(function (Setting $setting) {
             $setting->clearRelatedCaches();
         });
@@ -488,13 +491,13 @@ class Setting extends Model
      */
     protected function clearRelatedCaches(): void
     {
-        if (!config('oo-settings.cache.enabled', true)) {
+        if (! config('oo-settings.cache.enabled', true)) {
             return;
         }
-        
+
         try {
             $cacheManager = app('oo-settings')->getCacheManager();
-            
+
             if ($this->is_global) {
                 $cacheManager->forget($cacheManager->globalKey($this->key));
             } else {
