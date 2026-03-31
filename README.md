@@ -288,14 +288,10 @@ This package is open-sourced software licensed under the [MIT license](LICENSE).
 
 ## 🙏 Credits
 
-- **Berkay Barışkan** - *Lead Developer* - [@onaonbir](https://github.com/onaonbir)
+Built by [OnaOnbir](https://onaonbir.com).
 
 ---
 
-<div align="center">
+## License
 
-**Made with ❤️ for the Laravel community**
-
-[⭐ Star us on GitHub](https://github.com/onaonbir/oo-settings) • [🐛 Report Bug](https://github.com/onaonbir/oo-settings/issues) • [💡 Request Feature](https://github.com/onaonbir/oo-settings/issues)
-
-</div>
+MIT - See [LICENSE](LICENSE) for details.

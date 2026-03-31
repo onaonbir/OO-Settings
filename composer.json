@@ -2,21 +2,20 @@
     "name": "onaonbir/oo-settings",
     "description": "Production-ready, high-performance settings management system for Laravel applications with caching, validation, and event support.",
     "type": "library",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "license": "MIT",
+    "homepage": "https://onaonbir.com",
     "keywords": [
-        "laravel", 
-        "settings", 
-        "model settings", 
-        "polymorphic", 
-        "package",
+        "laravel",
+        "settings",
+        "model-settings",
+        "polymorphic",
         "cache",
         "validation",
         "events",
-        "production",
-        "performance"
+        "dot-notation",
+        "key-value"
     ],
-
     "require": {
         "php": "^8.3",
         "illuminate/support": "^10.0|^11.0|^12.0",
@@ -25,7 +24,6 @@
         "illuminate/validation": "^10.0|^11.0|^12.0",
         "illuminate/events": "^10.0|^11.0|^12.0"
     },
-    
     "require-dev": {
         "phpunit/phpunit": "^10.0|^11.0",
         "orchestra/testbench": "^8.0|^9.0",
@@ -33,7 +31,6 @@
         "laravel/pint": "^1.13",
         "mockery/mockery": "^1.6"
     },
-
     "autoload": {
         "psr-4": {
             "OnaOnbir\\OOSettings\\": "src/"
@@ -42,13 +39,11 @@
             "helpers/oo_settings_helper.php"
         ]
     },
-
     "autoload-dev": {
         "psr-4": {
             "OnaOnbir\\OOSettings\\Tests\\": "tests/"
         }
     },
-
     "extra": {
         "laravel": {
             "providers": [
@@ -57,33 +52,25 @@
             "aliases": {
                 "OOSettings": "OnaOnbir\\OOSettings\\Facades\\OOSettings"
             }
-        },
-        "branch-alias": {
-            "dev-main": "2.0-dev"
         }
     },
-
     "authors": [
         {
-            "name": "Berkay Barışkan",
-            "email": "berkaybariskan0208@gmail.com",
-            "role": "Developer"
+            "name": "OnaOnbir",
+            "email": "dev@onaonbir.com",
+            "homepage": "https://onaonbir.com"
         }
     ],
-
     "support": {
         "issues": "https://github.com/onaonbir/oo-settings/issues",
-        "source": "https://github.com/onaonbir/oo-settings",
-        "docs": "https://github.com/onaonbir/oo-settings/wiki"
+        "source": "https://github.com/onaonbir/oo-settings"
     },
-
     "funding": [
         {
             "type": "github",
             "url": "https://github.com/sponsors/onaonbir"
         }
     ],
-
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
@@ -91,14 +78,12 @@
         "format": "vendor/bin/pint",
         "format-test": "vendor/bin/pint --test"
     },
-
     "config": {
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true
         }
     },
-
     "minimum-stability": "stable",
     "prefer-stable": true
 }
